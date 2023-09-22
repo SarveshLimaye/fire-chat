@@ -1,8 +1,20 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/auth";
+import { signOut } from "firebase/auth";
+import { auth, db } from "../../utils/firebase";
+import { update, ref } from "firebase/database";
 
 export default function Navbar() {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
+  const { user } = useContext(AuthContext);
+  const handleSignout = async () => {
+    await update(ref(db, `users/${auth.currentUser.uid}`), {
+      isOnline: false,
+    });
+    await signOut(auth);
+    console.log("Signed out");
+  };
   return (
     <>
       <nav className="relative flex flex-wrap items-center justify-between px-2 py-3 bg-violet-500 mb-3">
@@ -29,26 +41,36 @@ export default function Navbar() {
             }
             id="example-navbar-danger"
           >
-            <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
-              <li className="nav-item">
-                <Link
-                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
-                  to="/login"
-                >
-                  <i className="fab fa-facebook-square text-lg leading-lg text-white opacity-75"></i>
-                  <span className="ml-2">Login</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
-                  to="/register"
-                >
-                  <i className="fab fa-twitter text-lg leading-lg text-white opacity-75"></i>
-                  <span className="ml-2">Register</span>
-                </Link>
-              </li>
-            </ul>
+            {user ? (
+              <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
+                <li className="nav-item">
+                  <div className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75">
+                    <button className="btn" onClick={handleSignout}>
+                      Logout
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            ) : (
+              <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
+                <li className="nav-item">
+                  <Link
+                    className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
+                    to="/login"
+                  >
+                    <span className="ml-2">Login</span>
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
+                    to="/register"
+                  >
+                    <span className="ml-2">Register</span>
+                  </Link>
+                </li>
+              </ul>
+            )}
           </div>
         </div>
       </nav>
