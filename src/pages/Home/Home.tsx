@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { db, auth } from "../../utils/firebase";
-import { ref, onValue, set, push } from "firebase/database";
+import {
+  ref,
+  onValue,
+  set,
+  push,
+  orderByChild,
+  query,
+} from "firebase/database";
 import { Timestamp } from "firebase/firestore";
 import UserListItem from "../../components/UserList/UserListItem";
+import MessageCard from "../../components/Message/MessageCard.tsx";
 import MessageForm from "../../components/MessageForm/MessageForm";
 
 export default function Home() {
   const [users, setUsers] = useState({});
+  const [msg, setMsgs] = useState({});
   const [selectedName, setSelectedName] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const [text, setText] = useState("");
@@ -29,7 +38,18 @@ export default function Home() {
   const selectUser = (user) => {
     setSelectedUser(user);
     setSelectedName(user.name);
+    const user2 = user.uid;
+    const id = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}`;
+    const msgref = ref(db, "messages/" + id + "/chats");
+    const ascmessages = query(msgref, orderByChild("createdAt/nanoseconds"));
+    onValue(ascmessages, (snapshot) => {
+      const data = snapshot.val();
+      setMsgs(data);
+    });
   };
+
+  const msgarray = Object.values(msg);
+  console.log(msgarray);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,7 +74,7 @@ export default function Home() {
       to: user2,
       createdAt: Timestamp.fromDate(new Date()),
       serverReceived: true,
-      sent: true,
+      sent: false,
       read: false,
     });
 
@@ -63,55 +83,74 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex h-screen">
-        <div className="w-1/2 bg-gray-100 p-4">
-          <h2 className="text-xl font-semibold mb-4">User List</h2>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Online Users</h3>
-            <ul>
-              {onlineUsers.map((user) => (
-                <UserListItem
-                  key={user.id}
-                  user={user}
-                  isOnline={true}
-                  selectUser={selectUser}
-                />
-              ))}
-            </ul>
+      <div className="messenger p-4 bg-white h-screen overflow-hidden">
+        <div className="flex">
+          <div className="basis-2/6 pt-3 bg-white border-r border-slate-100">
+            <div>
+              <h2 className="text-xl font-semibold mb-4">User List</h2>
+            </div>
+            <div className="user-list overflow-y-auto h-screen bg-white">
+              <h3 className="text-lg font-semibold mb-2">Online Users</h3>
+              <ul>
+                {onlineUsers.map((user) => (
+                  <UserListItem
+                    key={user.id}
+                    user={user}
+                    isOnline={true}
+                    selectUser={selectUser}
+                    user1={user1}
+                  />
+                ))}
+              </ul>
+              <h3 className="text-lg font-semibold mt-4 mb-2">Offline Users</h3>
+              <ul>
+                {offlineUsers.map((user) => (
+                  <UserListItem
+                    key={user.id}
+                    user={user}
+                    isOnline={false}
+                    selectUser={selectUser}
+                    user1={user1}
+                  />
+                ))}
+              </ul>
+            </div>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold mt-4 mb-2">Offline Users</h3>
-            <ul>
-              {offlineUsers.map((user) => (
-                <UserListItem
-                  key={user.id}
-                  user={user}
-                  isOnline={false}
-                  selectUser={selectUser}
-                />
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="w-1/2 bg-white flex flex-col justify-between h-full">
-          {selectedName ? (
-            <>
-              <div className="bg-gray-100 py-2  ">
-                <h2 className="text-xl font-semibold text-center">
-                  {selectedName}
-                </h2>
+          <div className="basis-4/6">
+            <div>
+              <div className="bg-slate-100 user-info-header px-5 py-3">
+                {selectedName ? (
+                  <h2 className="text-xl font-semibold text-center">
+                    {selectedName}
+                  </h2>
+                ) : null}
               </div>
-              <MessageForm
-                text={text}
-                setText={setText}
-                handleSubmit={handleSubmit}
-              />
-            </>
-          ) : (
-            <h3> Select a user to start conversation</h3>
-          )}
+              {selectedName ? (
+                <div className="message-area mt-4 px-4">
+                  {msgarray.map((item, index) => (
+                    <MessageCard
+                      text={item.text}
+                      from={item.from}
+                      key={index}
+                      user1={user1}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <h3> Select an user to continue </h3>
+              )}
+            </div>
 
-          {/* Chat text input and send button */}
+            {selectedName ? (
+              <div className="fixed bottom-0">
+                <MessageForm
+                  text={text}
+                  setText={setText}
+                  handleSubmit={handleSubmit}
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </>
