@@ -1,18 +1,24 @@
 import React from "react";
 
 interface User {
-  id: string;
+  uid: string;
   name?: string;
+  email: string;
+  isOnline: boolean;
 }
 
 interface UserListItemProps {
   user: User;
   isOnline: boolean;
+  selectUser: (userId: string) => void;
 }
 
-const UserListItem = ({ user, isOnline }): UserListItemProps => {
+const UserListItem = ({ user, isOnline, selectUser }): UserListItemProps => {
   return (
-    <li className="flex items-center bg-white p-2 mb-2 rounded shadow">
+    <li
+      className="flex items-center bg-white p-2 mb-2 rounded shadow"
+      onClick={() => selectUser(user)}
+    >
       <div className="flex items-center">
         <div
           className={`w-8 h-8 rounded-full ${
