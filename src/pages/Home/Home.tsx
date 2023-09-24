@@ -6,6 +6,7 @@ import {
   set,
   push,
   orderByChild,
+  update,
   query,
 } from "firebase/database";
 import { Timestamp } from "firebase/firestore";
@@ -48,8 +49,7 @@ export default function Home() {
     });
   };
 
-  const msgarray = Object.values(msg);
-  console.log(msgarray);
+  const msgarray = msg === null ? [] : Object.values(msg);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,6 +58,8 @@ export default function Home() {
     console.log(id);
     const msgref = ref(db, "messages/" + id + "/chats");
     const newmsgref = push(msgref);
+    const chatid = newmsgref._path.pieces_[3];
+
     await set(newmsgref, {
       text,
       from: user1,
@@ -74,10 +76,15 @@ export default function Home() {
       to: user2,
       createdAt: Timestamp.fromDate(new Date()),
       serverReceived: true,
-      sent: false,
+      sent: true,
       read: false,
     });
+    console.log(id);
+    console.log(chatid);
 
+    await update(ref(db, `messages/${id}/chats/${chatid}`), {
+      sent: true,
+    });
     setText("");
   };
 
@@ -99,6 +106,7 @@ export default function Home() {
                     isOnline={true}
                     selectUser={selectUser}
                     user1={user1}
+                    msg={msg}
                   />
                 ))}
               </ul>
@@ -111,6 +119,7 @@ export default function Home() {
                     isOnline={false}
                     selectUser={selectUser}
                     user1={user1}
+                    msg={msg}
                   />
                 ))}
               </ul>
@@ -127,11 +136,10 @@ export default function Home() {
               </div>
               {selectedName ? (
                 <div className="message-area mt-4 px-4">
-                  {msgarray.map((item, index) => (
+                  {msgarray.map((item) => (
                     <MessageCard
                       text={item.text}
                       from={item.from}
-                      key={index}
                       user1={user1}
                     />
                   ))}

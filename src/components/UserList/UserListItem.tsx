@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { db } from "../../utils/firebase";
+import { ref, onValue } from "firebase/database";
 
 interface User {
   uid: string;
@@ -13,7 +15,31 @@ interface UserListItemProps {
   selectUser: (userId: string) => void;
 }
 
-const UserListItem = ({ user, isOnline, selectUser }): UserListItemProps => {
+const UserListItem = ({
+  user,
+  isOnline,
+  selectUser,
+  user1,
+}): UserListItemProps => {
+  const [newmsg, setnewmsg] = useState({});
+
+  const [msgid, setmsgid] = useState("");
+  const user2 = user.uid;
+
+  useEffect(() => {
+    const id = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}`;
+    setmsgid(id);
+
+    const getLatestmsg = () => {
+      const msgref = ref(db, "lastmsg", id);
+      onValue(msgref, (snapshot) => {
+        const data = snapshot.val();
+        setnewmsg(data);
+      });
+    };
+    getLatestmsg();
+  }, []);
+
   return (
     <li
       className="flex items-center bg-white p-2 mb-2 rounded shadow"
@@ -33,10 +59,18 @@ const UserListItem = ({ user, isOnline, selectUser }): UserListItemProps => {
           <h3 className="text-lg font-semibold">
             {user.name || "Placeholder Name"}
           </h3>
-          <p className={isOnline ? "text-green-600" : "text-gray-500"}>
-            {isOnline ? "Online" : "Offline"}
-          </p>
+          {newmsg === null
+            ? null
+            : user1 === newmsg[msgid]?.to && <p>{newmsg[msgid]?.text}</p>}
         </div>
+
+        {newmsg !== null &&
+        user1 === newmsg[msgid]?.to &&
+        newmsg[msgid]?.read === false ? (
+          <small className="ml-2 text-white py-[2px] px-[6px] bg-green-400 rounded-lg justify-end">
+            New
+          </small>
+        ) : null}
       </div>
     </li>
   );
