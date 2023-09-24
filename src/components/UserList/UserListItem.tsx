@@ -61,7 +61,9 @@ const UserListItem = ({
           </h3>
           {newmsg === null
             ? null
-            : user1 === newmsg[msgid]?.to && <p>{newmsg[msgid]?.text}</p>}
+            : user1 === newmsg[msgid]?.to && (
+                <p>{newmsg[msgid]?.text.slice(0, 20)}</p>
+              )}
         </div>
 
         {newmsg !== null &&
