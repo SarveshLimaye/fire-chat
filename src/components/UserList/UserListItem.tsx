@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../utils/firebase";
-import { ref, onValue, update } from "firebase/database";
+import { ref, onValue } from "firebase/database";
 
 interface User {
   uid: string;
@@ -46,13 +46,17 @@ const UserListItem = ({
       onClick={() => selectUser(user)}
     >
       <div className="flex items-center">
-        <div
-          className={`w-8 h-8 rounded-full ${
-            isOnline ? "bg-green-500" : "bg-gray-400"
-          }`}
-        >
+        <div className="w-8 h-8 relative">
+          <img
+            alt="h"
+            className="w-8 h-8 rounded-full"
+            src="https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png"
+          />
           {isOnline && (
-            <div className="w-4 h-4 bg-green-300 rounded-full"></div>
+            <div
+              className="w-2.5 h-2.5 bg-green-400 rounded-full absolute bottom-0 right-0"
+              title="Online"
+            ></div>
           )}
         </div>
         <div className="ml-2">

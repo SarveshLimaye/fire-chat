@@ -16,18 +16,18 @@ export default function MessageCard({
         className={`px-5 mb-2 ${
           user1 === from
             ? `bg-violet-400 text-white`
-            : `bg-violet-200 text-slate-500`
+            : `bg-violet-200 text-slate-600`
         } text-white py-2 text-sm max-w-[80%] rounded font-light`}
       >
         <p>{text}</p>
         {serverReceived && !sent && !read && user1 === from ? (
-          <small className="float-right">✓</small>
+          <small className="float-right text-slate-100">✓</small>
         ) : null}
         {sent && serverReceived && !read && user1 === from ? (
-          <small className="float-right">✓✓</small>
+          <small className="float-right text-slate-100">✓✓</small>
         ) : null}
         {sent && serverReceived && read && user1 === from ? (
-          <small className="float-right text-blue-200">✓✓</small>
+          <small className="float-right text-blue-600">✓✓</small>
         ) : null}
       </div>
     </div>

@@ -111,7 +111,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="messenger p-4 bg-white h-screen overflow-hidden">
+      <div className="messenger pl-4 pb-4 bg-white h-screen overflow-hidden">
         <div className="flex">
           <div className="basis-2/6 pt-3 bg-white border-r border-slate-100">
             <div>
@@ -174,7 +174,7 @@ export default function Home() {
             </div>
 
             {selectedName ? (
-              <div className="fixed bottom-0">
+              <div>
                 <MessageForm
                   text={text}
                   setText={setText}
