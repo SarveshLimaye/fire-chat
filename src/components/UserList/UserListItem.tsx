@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../utils/firebase";
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, update } from "firebase/database";
 
 interface User {
   uid: string;
@@ -61,7 +61,8 @@ const UserListItem = ({
           </h3>
           {newmsg === null
             ? null
-            : user1 === newmsg[msgid]?.to && (
+            : user1 === newmsg[msgid]?.to &&
+              newmsg[msgid]?.read === false && (
                 <p>{newmsg[msgid]?.text.slice(0, 20)}</p>
               )}
         </div>
