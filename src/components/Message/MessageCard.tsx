@@ -1,4 +1,11 @@
-export default function MessageCard({ text, from, user1 }) {
+export default function MessageCard({
+  text,
+  from,
+  user1,
+  serverReceived,
+  sent,
+  read,
+}) {
   return (
     <div
       className={`relative receive-chat flex   ${
@@ -13,7 +20,15 @@ export default function MessageCard({ text, from, user1 }) {
         } text-white py-2 text-sm max-w-[80%] rounded font-light`}
       >
         <p>{text}</p>
-        <small className="float-right">✓</small>
+        {serverReceived && !sent && !read && user1 === from ? (
+          <small className="float-right">✓</small>
+        ) : null}
+        {sent && serverReceived && !read && user1 === from ? (
+          <small className="float-right">✓✓</small>
+        ) : null}
+        {sent && serverReceived && read && user1 === from ? (
+          <small className="float-right text-blue-200">✓✓</small>
+        ) : null}
       </div>
     </div>
   );

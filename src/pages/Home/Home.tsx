@@ -36,7 +36,7 @@ export default function Home() {
   const userArray = Object.values(users);
   const onlineUsers = userArray.filter((user) => user.isOnline);
   const offlineUsers = userArray.filter((user) => !user.isOnline);
-  const selectUser = (user) => {
+  const selectUser = async (user) => {
     setSelectedUser(user);
     setSelectedName(user.name);
     const user2 = user.uid;
@@ -47,6 +47,26 @@ export default function Home() {
       const data = snapshot.val();
       setMsgs(data);
     });
+    const latestref = ref(db, "lastmsg", id);
+    let obj = {};
+    onValue(latestref, (snapshot) => {
+      const data = snapshot.val();
+      console.log(data);
+
+      obj = data;
+    });
+    if (obj && obj[id].from !== user1) {
+      const newref = ref(db, `lastmsg/${id}`);
+      await update(newref, {
+        read: true,
+      });
+
+      const chatid = obj[id].chatid;
+      console.log(`messages/${id}/chats/${chatid}`);
+      await update(ref(db, `messages/${id}/chats/${chatid}`), {
+        read: true,
+      });
+    }
   };
 
   const msgarray = msg === null ? [] : Object.values(msg);
@@ -77,6 +97,7 @@ export default function Home() {
       createdAt: Timestamp.fromDate(new Date()),
       serverReceived: true,
       sent: true,
+      chatid: chatid,
       read: false,
     });
     console.log(id);
@@ -141,6 +162,9 @@ export default function Home() {
                       text={item.text}
                       from={item.from}
                       user1={user1}
+                      sent={item.sent}
+                      serverReceived={item.serverReceived}
+                      read={item.read}
                     />
                   ))}
                 </div>
