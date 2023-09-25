@@ -9,12 +9,15 @@ export default function Navbar() {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
   const { user } = useContext(AuthContext);
   const handleSignout = async () => {
-    await update(ref(db, `users/${auth.currentUser.uid}`), {
-      isOnline: false,
-    });
-    await signOut(auth);
-    console.log("Signed out");
+    if (auth.currentUser) {
+      await update(ref(db, `users/${auth.currentUser.uid}`), {
+        isOnline: false,
+      });
+      await signOut(auth);
+      console.log("Signed out");
+    }
   };
+
   return (
     <>
       <nav className="relative flex flex-wrap items-center justify-between px-2 py-3 bg-violet-500 mb-0">

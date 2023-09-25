@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../utils/firebase";
 import { update, ref } from "firebase/database";
@@ -13,7 +13,6 @@ interface LoginData {
 
 export default function Login() {
   const [data, setData] = useState<LoginData>({
-    name: "",
     email: "",
     password: "",
     error: null,
@@ -24,11 +23,11 @@ export default function Login() {
 
   const { email, password, error, loading }: LoginData = data;
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setData({ ...data, error: null, loading: true });
     if (!email || !password) {
@@ -48,7 +47,7 @@ export default function Login() {
         loading: false,
       });
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       setData({ ...data, error: err.message, loading: false });
     }
   };

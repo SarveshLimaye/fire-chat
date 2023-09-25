@@ -1,6 +1,10 @@
-import React from "react";
+interface MessageFormProps {
+  text: string;
+  setText: (text: string) => void;
+  handleSubmit: (e: any) => Promise<void>;
+}
 
-export default function MessageForm({ text, setText, handleSubmit }) {
+const MessageForm = ({ text, setText, handleSubmit }: MessageFormProps) => {
   return (
     <div className="p-4 flex items-center fixed bottom-0 w-[65%]">
       <input
@@ -18,4 +22,6 @@ export default function MessageForm({ text, setText, handleSubmit }) {
       </button>
     </div>
   );
-}
+};
+
+export default MessageForm;

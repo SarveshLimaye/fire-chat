@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { db, auth } from "../../utils/firebase";
 import {
   ref,
@@ -15,12 +15,12 @@ import MessageCard from "../../components/Message/MessageCard.tsx";
 import MessageForm from "../../components/MessageForm/MessageForm";
 
 export default function Home() {
-  const [users, setUsers] = useState({});
-  const [msg, setMsgs] = useState({});
-  const [selectedName, setSelectedName] = useState("");
-  const [selectedUser, setSelectedUser] = useState("");
-  const [text, setText] = useState("");
-  const user1 = auth.currentUser.uid;
+  const [users, setUsers] = useState<{ [key: string]: any }>({});
+  const [msg, setMsgs] = useState<{ [key: string]: any }>({});
+  const [selectedName, setSelectedName] = useState<string>("");
+  const [selectedUser, setSelectedUser] = useState<any | null>(null); // Update the initial type
+  const [text, setText] = useState<string>("");
+  const user1 = auth.currentUser?.uid || ""; // Provide a default value for user1
 
   useEffect(() => {
     const getUsers = async () => {
@@ -36,33 +36,38 @@ export default function Home() {
   const userArray = Object.values(users);
   const onlineUsers = userArray.filter((user) => user.isOnline);
   const offlineUsers = userArray.filter((user) => !user.isOnline);
-  const selectUser = async (user) => {
+  const selectUser = async (user: any) => {
     setSelectedUser(user);
     setSelectedName(user.name);
     const user2 = user.uid;
-    const id = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}`;
+    const id: string = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}`;
+
     const msgref = ref(db, "messages/" + id + "/chats");
     const ascmessages = query(msgref, orderByChild("createdAt/nanoseconds"));
     onValue(ascmessages, (snapshot) => {
       const data = snapshot.val();
       setMsgs(data);
     });
-    const latestref = ref(db, "lastmsg", id);
+
     let obj = {};
-    onValue(latestref, (snapshot) => {
+    onValue(ref(db, `lastmsg/${id}`), (snapshot) => {
       const data = snapshot.val();
       console.log(data);
 
       obj = data;
     });
-    if (obj && obj[id].from !== user1) {
+    console.log(obj);
+
+    if (obj && "from" in obj && obj.from !== user1) {
       const newref = ref(db, `lastmsg/${id}`);
       await update(newref, {
         read: true,
       });
-
-      const chatid = obj[id].chatid;
-      console.log(`messages/${id}/chats/${chatid}`);
+      let chatid;
+      if (obj && "chatid" in obj) {
+        chatid = obj.chatid;
+        // Your code here
+      }
       await update(ref(db, `messages/${id}/chats/${chatid}`), {
         read: true,
       });
@@ -71,14 +76,16 @@ export default function Home() {
 
   const msgarray = msg === null ? [] : Object.values(msg);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     const user2 = selectedUser.uid;
     const id = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}`;
-    console.log(id);
     const msgref = ref(db, "messages/" + id + "/chats");
     const newmsgref = push(msgref);
-    const chatid = newmsgref._path.pieces_[3];
+    console.log();
+
+    const chatid: string | null = newmsgref.key;
+    console.log(chatid);
 
     await set(newmsgref, {
       text,
@@ -100,8 +107,6 @@ export default function Home() {
       chatid: chatid,
       read: false,
     });
-    console.log(id);
-    console.log(chatid);
 
     await update(ref(db, `messages/${id}/chats/${chatid}`), {
       sent: true,
@@ -127,7 +132,6 @@ export default function Home() {
                     isOnline={true}
                     selectUser={selectUser}
                     user1={user1}
-                    msg={msg}
                   />
                 ))}
               </ul>
@@ -140,7 +144,6 @@ export default function Home() {
                     isOnline={false}
                     selectUser={selectUser}
                     user1={user1}
-                    msg={msg}
                   />
                 ))}
               </ul>
@@ -159,6 +162,7 @@ export default function Home() {
                 <div className="message-area mt-4 px-4">
                   {msgarray.map((item) => (
                     <MessageCard
+                      key={item.id}
                       text={item.text}
                       from={item.from}
                       user1={user1}
