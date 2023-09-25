@@ -33,11 +33,15 @@ export default function Navbar() {
               FireChat
             </Link>
             <button
-              className="bg-white cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"
+              className="cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"
               type="button"
               onClick={() => setNavbarOpen(!navbarOpen)}
             >
-              <i className="fas fa-bars text-white"></i>
+              <img
+                src="https://www.clipartmax.com/png/full/36-365828_navbar-toggle-icon-menu-hamburger-png-white.png"
+                alt="hh"
+                className="w-8 h-6"
+              />
             </button>
           </div>
           <div
@@ -50,10 +54,11 @@ export default function Navbar() {
             {user ? (
               <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
                 <li className="nav-item">
-                  <div className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75">
-                    <button className="btn" onClick={handleSignout}>
-                      Logout
-                    </button>
+                  <div
+                    className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
+                    onClick={handleSignout}
+                  >
+                    <span className="ml-2">Logout</span>
                   </div>
                 </li>
               </ul>
