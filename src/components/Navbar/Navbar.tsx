@@ -4,16 +4,19 @@ import { AuthContext } from "../../context/auth";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../../utils/firebase";
 import { update, ref } from "firebase/database";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const handleSignout = async () => {
     if (auth.currentUser) {
       await update(ref(db, `users/${auth.currentUser.uid}`), {
         isOnline: false,
       });
       await signOut(auth);
+      navigate("/login");
       console.log("Signed out");
     }
   };
