@@ -159,7 +159,7 @@ export default function Home() {
                 ) : null}
               </div>
               {selectedName ? (
-                <div className="message-area mt-4 px-4">
+                <div className="message-area mt-4 px-4 max-h-[70vh] overflow-y-auto">
                   {msgarray.map((item) => (
                     <MessageCard
                       key={item.id}
