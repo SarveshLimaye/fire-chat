@@ -1,11 +1,20 @@
-export default function MessageCard({
+interface MessageCardProps {
+  text: string;
+  from: string;
+  user1: string;
+  serverReceived: boolean;
+  sent: boolean;
+  read: boolean;
+}
+
+const MessageCard = ({
   text,
   from,
   user1,
   serverReceived,
   sent,
   read,
-}) {
+}: MessageCardProps) => {
   return (
     <div
       className={`relative receive-chat flex   ${
@@ -32,4 +41,6 @@ export default function MessageCard({
       </div>
     </div>
   );
-}
+};
+
+export default MessageCard;

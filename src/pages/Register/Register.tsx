@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { Link } from "react-router-dom";
 import { auth, db } from "../../utils/firebase";
@@ -25,11 +25,11 @@ export default function Register() {
 
   const { name, email, password, error, loading }: UserData = data;
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setData({ ...data, error: null, loading: true });
     if (!name || !email || !password) {
@@ -57,7 +57,7 @@ export default function Register() {
         loading: false,
       });
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       setData({ ...data, error: err.message, loading: false });
     }
   };
