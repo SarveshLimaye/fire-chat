@@ -50,32 +50,27 @@ export default function Home() {
       setMsgs(data);
     });
 
-    let obj = {};
+    let obj: any = {};
     onValue(ref(db, `lastmsg/${id}`), (snapshot) => {
       const data = snapshot.val();
       console.log(data);
 
-      obj = data;
+      obj = data || null;
     });
     console.log(obj);
 
-    if (obj && "from" in obj && obj.from !== user1) {
+    if (obj && "from" in obj && obj?.from !== user1) {
       const newref = ref(db, `lastmsg/${id}`);
       await update(newref, {
         read: true,
       });
-      let chatid;
-      if (obj && "chatid" in obj) {
-        chatid = obj.chatid;
-        // Your code here
-      }
 
       const msgref = ref(db, `messages/${id}/chats/`);
       onValue(msgref, (snapshot) => {
         snapshot.forEach((childSnapshot) => {
           const key = childSnapshot.key;
-          if (obj.read) {
-            console.log(obj.read);
+          if (obj?.read) {
+            console.log(obj?.read);
             console.log(msgarray);
             update(ref(db, `messages/${id}/chats/${key}`), {
               read: true,
@@ -83,10 +78,6 @@ export default function Home() {
           }
         });
       });
-
-      // await update(ref(db, `messages/${id}/chats/${chatid}`), {
-      //   read: true,
-      // });
     }
   };
 
