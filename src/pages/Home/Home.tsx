@@ -36,6 +36,7 @@ export default function Home() {
   const userArray = Object.values(users);
   const onlineUsers = userArray.filter((user) => user.isOnline);
   const offlineUsers = userArray.filter((user) => !user.isOnline);
+  const msgarray = msg === null ? [] : Object.values(msg);
   const selectUser = async (user: any) => {
     setSelectedUser(user);
     setSelectedName(user.name);
@@ -68,13 +69,26 @@ export default function Home() {
         chatid = obj.chatid;
         // Your code here
       }
-      await update(ref(db, `messages/${id}/chats/${chatid}`), {
-        read: true,
+
+      const msgref = ref(db, `messages/${id}/chats/`);
+      onValue(msgref, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          const key = childSnapshot.key;
+          if (obj.read) {
+            console.log(obj.read);
+            console.log(msgarray);
+            update(ref(db, `messages/${id}/chats/${key}`), {
+              read: true,
+            });
+          }
+        });
       });
+
+      // await update(ref(db, `messages/${id}/chats/${chatid}`), {
+      //   read: true,
+      // });
     }
   };
-
-  const msgarray = msg === null ? [] : Object.values(msg);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -110,6 +124,7 @@ export default function Home() {
 
     await update(ref(db, `messages/${id}/chats/${chatid}`), {
       sent: true,
+      read: false,
     });
     setText("");
   };
@@ -159,7 +174,7 @@ export default function Home() {
                 ) : null}
               </div>
               {selectedName ? (
-                <div className="message-area mt-4 px-4 max-h-[70vh] overflow-y-auto">
+                <div className="message-area mt-4 px-4 max-h-[60vh] overflow-y-auto">
                   {msgarray.map((item) => (
                     <MessageCard
                       key={item.id}
